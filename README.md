@@ -1,4 +1,4 @@
-# **Diadem**:	A python library for **D**eep **I**nter**a**ctive **de**cision **m**aking 
+# **Diadem**:	A python library for **D**eep **i**nter**a**ctive **de**cision **m**aking 
 
 A python library to develop and train interaction-aware decision making algorithms based on tensorflow<2.0. The focus will be on combinations of deep reinforcement learning algorithms and classical AI techniques such as MCTS. Currently, the training and evaluation framework and DQN variants (prioritized experience replay, Learning from Demonstrations (DQfD), C51, Quantile Regression DQN) are implemented. With the environment wrapper class, the library allows integration of different environments, standard benchmarks such as [OpenAI Gym](https://gym.openai.com/) but also [bark](https://github.com/bark-simulator/bark), focusing on interactive decision making in multi-agent scenarios.  
 
@@ -15,7 +15,7 @@ A python library to develop and train interaction-aware decision making algorith
 1. Clone the repository and change to base repository directory 
 2. `bash scripts/setup_venv.sh`: this will create a virtual python environment (located in ./venv) and install all necessary python dependencies.
 2. `source scripts/into_venv.sh`: this will activate the virtual environment (keep this in mind for the future: each time you use Bazel, even beyond this installation, be sure to have run this command beforehand)
-4. `bazel test //...`: this will run all specified tests. All tests should pass successfully. (individual tests can be executed e.g. with `//examples:dqn_basic' //python:name_of_module`, e.g `bazel test
+4. `bazel test //...`: this will run all specified tests. All tests should pass successfully. (individual tests can be executed e.g. with `//examples:dqn_basic`, e.g `bazel test
 5. For online rendering of the environment use the run mode, e.g for the GymCartpole environment and DQN use `bazel run //examples:basic_dqn`
 
 
