@@ -1,0 +1,12 @@
+tensorflow==1.9.0
+gym
+numpy<=1.14.5,>=1.13.3
+objgraph
+pygame
+psutil
+scipy
+pyyaml
+statsmodels
+svgutils
+pandas
+
