@@ -21,5 +21,5 @@ Diadem is a python library for development and training of interaction-aware dec
 
 ## Examples
 
-The examples folder provides  use cases for a Quantile Regression DQN or Categorical DQN algorithm with the Gym environment wrapper. The configuration files extend from the [common configuration](./examples/example_params/common_parameters.yaml) by importing the `base` property in the common parameters file. This allows that you do not have to repeat every parameter in your experiment parameter file but only the ones that differ from the common configuration.
+The examples folder shows how to run the DQN variants with the OpenAIGym environment wrapper. The configuration files extend from the [common configuration](./examples/example_params/common_parameters.yaml) by importing the `base` property from the common parameters file. This allows for a simplistic parameter definition for specific use cases based on a common parameter set avoiding parameter repetitions.
 
