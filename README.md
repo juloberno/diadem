@@ -1,6 +1,6 @@
-# **Diadem**:	A python library for **D**eep **i**nter**a**ctive **de**cision **m**aking 
+# **Diadem** = **D**eep **i**nter**a**ctive **de**cision **m**aking 
 
-A python library to develop and train interaction-aware decision making algorithms based on tensorflow<2.0. The focus will be on combinations of deep reinforcement learning algorithms and classical AI techniques such as MCTS. Currently, the training and evaluation framework and DQN variants (prioritized experience replay, Learning from Demonstrations (DQfD), C51, Quantile Regression DQN) are implemented. With the environment wrapper class, the library allows integration of different environments, standard benchmarks such as [OpenAI Gym](https://gym.openai.com/) but also [bark](https://github.com/bark-simulator/bark), focusing on interactive decision making in multi-agent scenarios.  
+Diadem is a python library for development and training of interaction-aware decision making algorithms based on tensorflow<2.0. The focus is on combinations of Deep Reinforcement Learning with classical AI techniques, such as MCTS. Currently, the training and evaluation framework and DQN variants (prioritized experience replay, Learning from Demonstrations (DQfD), C51, Quantile Regression DQN) are implemented. With the environment wrapper class, the library allows integration of different environments, standard benchmarks such as [OpenAI Gym](https://gym.openai.com/) but also [bark](https://github.com/bark-simulator/bark), focusing on interactive decision making in multi-agent scenarios.  
 
 ![diadem Architecture Overview](./doc/DiademArchitecture.png)
 
