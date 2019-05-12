@@ -15,8 +15,8 @@ Diadem is a python library for development and training of interaction-aware dec
 1. Clone the repository and change to base repository directory 
 2. `bash scripts/setup_venv.sh`: this will create a virtual python environment (located in ./venv) and install all necessary python dependencies.
 2. `source scripts/into_venv.sh`: this will activate the virtual environment (keep this in mind for the future: each time you use Bazel, even beyond this installation, be sure to have run this command beforehand)
-4. `bazel test //...`: this will run all specified tests. All tests should pass successfully. (individual tests can be executed e.g. with `//examples:dqn_basic`, e.g `bazel test
-5. For online rendering of the environment use the run mode, e.g for the GymCartpole environment and DQN use `bazel run //examples:basic_dqn`
+4. `bazel test //...`: this will run all specified tests. All tests should pass successfully. (individual tests can be executed e.g. with `bazel test //examples:dqn_basic`
+5. For online rendering of the environment use the run mode, e.g for the GymCartpole environment and DQN use `bazel run //examples:dqn_basic`
 
 
 ## Examples
