@@ -19,7 +19,7 @@ from diadem.agents import AgentContext, AgentManager
 from diadem.environments import GymEnvironment
 from diadem.experiment import Experiment
 from diadem.experiment.visualizers import OnlineVisualizer
-from diadem.summary import ConsoleSummary
+from diadem.summary import PandasSummary
 from diadem.common import Params
 from diadem.preprocessors import Normalization
 
@@ -33,7 +33,7 @@ def run_dqn_algorithm(parameter_files):
         datamanager=None,
         preprocessor=Normalization(environment=environment),
         optimizer=tf.train.AdamOptimizer,
-        summary_service=ConsoleSummary()
+        summary_service=PandasSummary()
     )
     agent = AgentManager(
         params=params,

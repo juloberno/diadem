@@ -10,7 +10,7 @@ import os
 from diadem.agents.model import QNetwork, DistributionalQNetwork
 from diadem.environments import Environment
 
-from diadem.agents import Agent, DQfDAgent, DistributionalDQfDAgent, HbaAgent
+from diadem.agents import Agent, DQfDAgent, DistributionalDQfDAgent, HbaAgent, EnsembleAgent
 
 
 class AgentManager(Agent):
@@ -18,6 +18,7 @@ class AgentManager(Agent):
         'hba': HbaAgent,
         'dqfd': DQfDAgent,
         'distr_dqfd': DistributionalDQfDAgent,
+        'ensemble': EnsembleAgent
     }
     _network_classes = {
         'q_fully': QNetwork,
@@ -32,18 +33,29 @@ class AgentManager(Agent):
         self.context = context
 
         for name, agent_params in self.params['agents'].items():
-            agent_type = str(agent_params['agent_type'])
-            network_type = agent_params['network']['type']
-            network = self._agent_network(agent_type, network_type)
+            num_instances = agent_params['num_instances']
+            for instance_id in range(0,num_instances):
+                agent_type = str(agent_params['agent_type'])
+                network_type = agent_params['network']['type']
+                network = self._agent_network(agent_type, network_type)
 
-            self.agents[name] = self._agent_classes[agent_type](
-                params=agent_params,
-                context=self.context.clone(agent_params),
-                network_model=network
-            )
-            self.agents[name].name = agent_params['name'] or name
-            if agent_params['is_main_agent']:
-                self.main_agent = self.agents[name]
+                if num_instances > 1:
+                    agent_name = "{}{}".format(name,instance_id)
+                else:
+                    agent_name = name
+
+                self.agents[agent_name] = self._agent_classes[agent_type](
+                    params=agent_params,
+                    context=self.context.clone(agent_params),
+                    network_model=network
+                )
+                self.agents[agent_name].name = agent_params['name'] or agent_name
+                if agent_params['is_main_agent']:
+                    if num_instances == 1:
+                        self.main_agent = self.agents[agent_name]
+                    else:
+                        raise ValueError("There can only exist a single main agent. \
+                                    You passed num_istances = {}".format(num_instances))
 
     def _agent_network(self, agent_type, network_type):
         network_class = None
@@ -80,7 +92,8 @@ class AgentManager(Agent):
 
     def observe(self, *args, **kwargs):
         for agent in self.agents.values():
-            agent.observe(*args, **kwargs)
+            if agent.observe_via_agent_manager:
+                agent.observe(*args, **kwargs)
 
     def close(self):
         for agent in self.agents.values():

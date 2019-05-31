@@ -9,6 +9,7 @@ py_library(
         ":distributional_dqfd_agent",
         ":agent_manager",
         ":experience_replay_agent",
+        ":ensemble_agent"
     ],
     visibility = ["//diadem:__pkg__"],
 )
@@ -62,6 +63,14 @@ py_binary(
     deps = [
         ":agent",
         "//diadem/agents/exploration:__init__",
+    ],
+)
+
+py_binary(
+    name = "ensemble_agent",
+    srcs = ["ensemble_agent.py"],
+    deps = [
+        ":agent",
     ],
 )
 
