@@ -163,7 +163,6 @@ class Agent(BaseObject):
     def observe_via_agent_manager(self):
         return self._observe_via_agent_manager
 
-
     def freeze(self, global_step):
         if not self.params['training']:
             return

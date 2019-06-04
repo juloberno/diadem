@@ -4,6 +4,6 @@ agents:
     <<: *base_quantile_agent
     is_main_agent: 1
 
-experiment:
+experiment: 
   <<: *base_experiment
   max_episodes: 30

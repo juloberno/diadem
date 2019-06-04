@@ -58,13 +58,9 @@ class EnsembleAgent(Agent):
         if self.policy_sub_agent:
             return self.context.agent_manager.agent(self.policy_sub_agent).get_next_best_action(observation, *args, **kwargs)
         else:
-<<<<<<< HEAD
-            raise ValueError("No policy sub agent available")
-=======
             raise ValueError("No policy sub agent available")
 
 
 
      
 
->>>>>>> origin/master

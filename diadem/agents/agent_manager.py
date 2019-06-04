@@ -57,7 +57,6 @@ class AgentManager(Agent):
                         raise ValueError("There can only exist a single main agent. \
                                     You passed num_istances = {}".format(num_instances))
 
-
     def _agent_network(self, agent_type, network_type):
         network_class = None
         if agent_type == 'dqfd':
@@ -95,7 +94,7 @@ class AgentManager(Agent):
         for agent in self.agents.values():
             if agent.observe_via_agent_manager:
                 agent.observe(*args, **kwargs)
-            
+
     def close(self):
         for agent in self.agents.values():
             agent.close()

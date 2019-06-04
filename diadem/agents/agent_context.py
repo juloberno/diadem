@@ -26,7 +26,7 @@ class AgentContext:
         self.optimizer = optimizer
 
     def clone(self, new_agent_params):
-        # each agents holds its own copy, some of these are references, but for each agent a new graph is generated 
+        # each agents holds its own copy, some of these are references, but for each agent a new graph is generated
         # parameter copy clone, no instance clone, e.g. hba may need 
         environment = self.environment.__class__(
             params=new_agent_params['environment']) if new_agent_params['environment'] else self.environment

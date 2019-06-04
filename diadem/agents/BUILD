@@ -68,10 +68,10 @@ py_binary(
 
 py_binary(
     name = "ensemble_agent",
-    srcs = ["ensemble_agent.py"]
+    srcs = ["ensemble_agent.py"],
     deps = [
         ":agent",
-    ]
+    ],
 )
 
 py_library(
@@ -80,7 +80,7 @@ py_library(
     deps = [
         ":agents",
         ":agent_context"
-    ],
+    ]
 )
 
 py_library(
