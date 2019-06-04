@@ -15,4 +15,8 @@ agents:
 
 experiment: 
   <<: *base_experiment
+<<<<<<< HEAD
   max_episodes: 1000
+=======
+  max_episodes: 70
+>>>>>>> origin/master
