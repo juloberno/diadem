@@ -32,6 +32,17 @@ py_test(
 )
 
 py_test(
+    name = "dqn_ensemble",
+    srcs = ["dqn_ensemble.py"],
+    deps = [
+        ":run_dqn",
+    ],
+    data = [
+        "//examples/example_params:example_params",
+    ]
+)
+
+py_test(
     name = "dqn_distributional_categorical",
     srcs = ["dqn_distributional_categorical.py"],
     deps = [

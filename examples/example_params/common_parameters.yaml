@@ -1,15 +1,23 @@
 base:
   base_agents:
-    base_dqfd_agent: &base_dqfd_agent
-      agent_type: dqfd
+    base_agent: &base_agent
       is_main_agent: 1
+      observe_via_agent_manager: 1
+      num_instances: 1
+      summary: &base_agent_summary
+        running_average: 40
+        summary_every: 200
+
+    base_dqfd_agent: &base_dqfd_agent
+      <<: *base_agent
+      agent_type: dqfd
       training: 1
       use_only_cpu: 0
       allow_gpu_growth: 0
-      exploration: &base_agent_exploration
+      exploration: &dqfd_agent_exploration
         initialize_guidance_steps: 0
         type: random
-        epsilon: &base_agent_exploration_epsilon
+        epsilon: &base_dqfd_agent_exploration_epsilon
           start_value: 0.9
           end_value: 0.1
           num_steps: 90000
@@ -19,7 +27,7 @@ base:
       target_update_rate: 1
       n_step: 1
       supervised_margin: 0.5
-      network: &base_agent_fully_network
+      network: &base_dqfd_agent_fully_network
         type: fully_connected
         max_gradient: 10
         reg_param: 0.01
@@ -32,7 +40,7 @@ base:
         loss_one_step_weight: 1
         loss_n_step_weight: 1
         loss_supervised_weight: 1
-        optimizer: &base_agent_optimizer
+        optimizer: &base_dqfd_agent_optimizer
           learning_rate: 5.0e-05
           beta1: 0.9
           beta2: 0.999
@@ -41,24 +49,18 @@ base:
           name: Adam
       guidance:
         guiding_factor: 1
-      prioritizing: &base_agent_prioritizing
+      prioritizing: &base_dqfd_agent_prioritizing
         per_epsilon_alpha: 0.001
         per_epsilon_demo: 1
         per_alpha: 0.25
         replay_buffer_size: 100000
         store_replay_every: 1
         demo_capacity_factor: 0.25
-        per_beta: &base_agent_prioritizing_beta
+        per_beta: &base_dqfd_agent_prioritizing_beta
           start_value: 0.6
           end_value: 1
           num_steps: 75000
           anneal_type: lin
-      summary: &base_agent_summary
-        running_average: 40
-        summary_every: 200
-
-    base_agent: &base_agent
-      <<: *base_dqfd_agent
 
     base_categorical_agent: &base_categorical_agent
       <<: *base_dqfd_agent
@@ -67,7 +69,7 @@ base:
       loss:
         discount_factor: 0.95
       network: &base_agent_categorical_fully_network
-        <<: *base_agent_fully_network
+        <<: *base_dqfd_agent_fully_network
         min_reward: &min_reward -1000
         max_reward: &max_reward 100
         num_atoms: &num_atoms 200
@@ -82,11 +84,16 @@ base:
         huber_loss:
           delta: 1
       network: &base_agent_quantile_fully_network
-        <<: *base_agent_fully_network
+        <<: *base_dqfd_agent_fully_network
         min_reward: *min_reward
         max_reward: *max_reward
         num_atoms: *num_atoms
         quantile_regression: 1
+
+    base_ensemble_agent: &base_ensemble_agent
+      <<: *base_agent
+      agent_type: "ensemble"
+      agents_name_prefix: "sub_agent"
 
   base_parameters: &base
     datamanager: &base_datamanager

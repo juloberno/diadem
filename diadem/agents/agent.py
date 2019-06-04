@@ -113,6 +113,8 @@ class Agent(BaseObject):
         # TODO: change summary_every
         self.summary_every = self.params["summary"]["summary_every"]
 
+        self._observe_via_agent_manager = self.params["observe_via_agent_manager"]
+
     @abstractmethod
     def create_variables(self):
         self.global_step = tf.Variable(
@@ -156,6 +158,11 @@ class Agent(BaseObject):
         if self._saver is None:
             self._saver = tf.train.Saver(max_to_keep=self.params['max_kept_checkpoints'] or 0)
         return self._saver
+
+    @property
+    def observe_via_agent_manager(self):
+        return self._observe_via_agent_manager
+
 
     def freeze(self, global_step):
         if not self.params['training']:
