@@ -14,7 +14,6 @@ import tempfile
 import time
 import json
 import pickle
-import matplotlib.pyplot as plt
 
 from diadem.agents.model import DistributionalQNetwork
 from diadem.agents import DQfDAgent
