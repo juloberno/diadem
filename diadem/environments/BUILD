@@ -29,10 +29,16 @@ py_library(
 py_library(
     name = "bark_highway",
     srcs = ["bark_highway.py"],
-    data = ['@bark_project//python:bark.so'],
+    data = ['@bark_project//python:bark.so',
+            "@bark_project//modules/runtime/tests:xodr_data"],
     imports = ['../../bark_project/python/'],
     deps = [
         ":environment",
-        "@bark_project//modules/runtime:runtime"
+        "@bark_project//modules/runtime/ml:ml",
+        "@bark_project//modules/runtime/commons:parameters",
+        "@bark_project//modules/runtime/commons:commons",
+        "@bark_project//modules/runtime/scenario/scenario_generation:scenario_generation",
+        "@bark_project//modules/runtime/commons:xodr_parser",
+        "@bark_project//modules/runtime/commons:roadgraph_generator",
     ],
 )

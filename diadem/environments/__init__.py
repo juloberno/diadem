@@ -7,7 +7,7 @@
 
 from .environment import Environment
 from .gym_environment import GymEnvironment
-try:
-    from .bark_highway import BarkHighway
-except ImportError:
-    print("Bark import not available")
+#try:
+from .bark_highway import BarkHighway
+#except ImportError:
+#    print("Bark import not available")
