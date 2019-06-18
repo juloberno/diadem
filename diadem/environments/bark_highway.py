@@ -6,6 +6,7 @@
 
 
 import os
+import pygame
 
 from diadem.environments import Environment
 from bark_project.modules.runtime.scenario.scenario_generation.uniform_vehicle_distribution import UniformVehicleDistribution
@@ -47,6 +48,9 @@ class BarkHighway(Environment):
 
     def render(self, filename=None, show=True):
         self.runtime.render()
+        if filename:
+            img = pygame.display.get_surface()
+            pygame.image.save(img, filename)
 
     @property
     def actionspace(self):
