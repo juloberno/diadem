@@ -15,6 +15,7 @@ from bark_project.modules.runtime.ml.nn_state_observer import StateConcatenation
 from bark_project.modules.runtime.ml.action_wrapper import MotionPrimitives
 from bark_project.modules.runtime.ml.state_evaluator import GoalReached
 from bark_project.modules.runtime.commons.parameters import ParameterServer
+from bark_project.modules.runtime.viewer.matplotlib_viewer import MPViewer
 from bark_project.modules.runtime.viewer.pygame_viewer import PygameViewer
 
 class BarkHighway(Environment):
@@ -26,7 +27,7 @@ class BarkHighway(Environment):
         state_observer = StateConcatenation(params=params)
         action_wrapper = MotionPrimitives(params=params)
         evaluator = GoalReached(params=params)
-        viewer = PygameViewer(params=params, x_range=[-40,40], y_range=[-40,40], follow_agent_id=True) #use_world_bounds=True) # 
+        viewer = MPViewer(params=params, x_range=[-30,30], y_range=[-20,40], follow_agent_id=True) #use_world_bounds=True) # 
 
         self.runtime = RuntimeRL(action_wrapper=action_wrapper, nn_observer=state_observer,
                         evaluator=evaluator, step_time=0.2, viewer=viewer,
@@ -49,8 +50,11 @@ class BarkHighway(Environment):
     def render(self, filename=None, show=True):
         self.runtime.render()
         if filename:
-            img = pygame.display.get_surface()
-            pygame.image.save(img, filename)
+            if isinstance(self.runtime.viewer, PygameViewer):
+                img = pygame.display.get_surface()
+                pygame.image.save(img, filename)
+            elif isinstance(self.runtime.viewer, MPViewer):
+                self.runtime.viewer.axes.get_figure().savefig(filename)
 
     @property
     def actionspace(self):
