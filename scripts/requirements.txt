@@ -1,4 +1,4 @@
-tensorflow==1.9.0
+tensorflow==1.15.2
 gym
 numpy<=1.14.5,>=1.13.3
 objgraph
