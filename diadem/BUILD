@@ -10,5 +10,6 @@ py_library(
         "//diadem/environments:__init__",
         "//diadem/preprocessors:__init__",
     ],
+    imports = ["."],
     visibility = ["//visibility:public"],
 )
