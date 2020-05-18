@@ -324,7 +324,6 @@ class Experiment(BaseObject):
                 # get the next full state of the environment from which episode starts
                 sample = self.context.datamanager.get_random_train_sample() if self._select_random_train_sample else self.context.datamanager.get_next_train_sample()
                 self.context.summary_service.static_fields['sample_idx'] = self.context.datamanager.current_train_idx
-                
                 observation, init_error = self.context.environment.reset(
                     sample)
         else:
