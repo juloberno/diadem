@@ -58,7 +58,8 @@ class DQfDAgent(ExperienceReplayAgent):
         self.target_update_rate = self.params["target_update_rate"]
         self.double_q_learning = self.params["double_q_learning"]
         
-        if isinstance(self.context.environment.actionspace, spaces.Discrete):
+        if isinstance(self.context.environment.actionspace, spaces.Discrete) or \
+            issubclass(type(self.context.environment.actionspace), spaces.Discrete):
             self.num_discrete_actions = self.context.environment.actionspace.n
         else:
             raise ValueError("DQ(X) Agent only supports discrete action spaces.")
@@ -402,9 +403,6 @@ class DQfDAgent(ExperienceReplayAgent):
         return feed_dict, is_demo
 
     def observe(self, observation, action, reward, next_observation, done, info={}, guided=False, *args, **kwargs):
-        import objgraph
-
-
         observation = self.env_state_to_nn_input(observation)
         next_observation = self.env_state_to_nn_input(next_observation)
 

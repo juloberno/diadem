@@ -103,7 +103,6 @@ class Experiment(BaseObject):
             for i_episode in range(self.start_episode, self.max_episodes + 1):
                 self.log.info("Running episode {} of {}".format(i_episode, self.max_episodes))
                 self.context.summary_service.static_fields['episode'] = i_episode
-                self._analyse_memory('New Episode')
 
                 # Perform one episode
                 observation, _ = self._get_sample()
@@ -111,7 +110,6 @@ class Experiment(BaseObject):
                 done = False
                 step_count = 0
 
-                self._analyse_memory('Init Episode')
 
                 self.context.summary_service.static_fields['step'] = 0
 
@@ -120,26 +118,17 @@ class Experiment(BaseObject):
                     self.context.summary_service.static_fields['state'] = self.context.environment.state_as_string()
                     self.context.summary_service.static_fields['step'] = step_count
 
-                    self._analyse_memory('Init Step')
-
                     # get action
                     env_action, is_guided = self.agent.get_next_best_action(
                         observation=observation, explore=self.params['explore'], i_episode=i_episode)
-
-                    self._analyse_memory('Next best action')
 
                     # step environment
                     next_observation, reward, done, info = self.context.environment.step(
                         env_action)
 
-                    self._analyse_memory('Env Step')
-
                     # let agent observe reward
                     self.agent.observe(observation=observation, action=env_action, reward=reward, next_observation=next_observation,
                                        done=done, info=info, guided=is_guided)
-
-                    self._analyse_memory('Agent Observe')
-
                     # change to next state
                     observation = next_observation
                     step_count += 1
@@ -148,18 +137,14 @@ class Experiment(BaseObject):
                     if update_count % self.update_model_every_num_steps == 0:
                        self.agent.update_model()
 
-                    self._analyse_memory('Update Model')
-
                     self.log.debug('---------------------')
                     self.log.debug('Action: ' + str(env_action))
                     self.log.debug('Step count: ' +
-                            str(step_count * self.context.environment.action_timedelta))
+                            str(step_count))
                     self.log.debug('Step Reward: ' + str(reward))
 
                     if self.visualizer is not None:
                         self.visualizer.visualize(episode=i_episode, step=step_count, last_step=(done or step_count == self.max_agent_steps))
-
-                    self._analyse_memory('Visualizer')
 
                     summary_every = self.context.agent_manager.main_agent.params['summary']['summary_every']
                     if summary_every > 0 and update_count % summary_every == 0:
@@ -169,8 +154,6 @@ class Experiment(BaseObject):
                         self.store_model(i_cycle, i_episode,
                                          update_count, update_with_episode=False)
                         self.context.summary_service.dump(summary_path)
-
-                    self._analyse_memory('Summary freeze')
 
                     if done:
                         break
@@ -199,14 +182,10 @@ class Experiment(BaseObject):
                     "Finished after {} timesteps".format(step_count + 1))
                 start_time = time.time()
 
-                self._analyse_memory('Episode Freeze')
-
                 # Do intermediate evaluation of temporary model
                 if self.tmp_evaluation_every > 0 and (i_episode == 1 or i_episode % self.tmp_evaluation_every == 0):
                     self.evaluation(i_cycle, i_episode,
                                     update_count, is_final=False)
-
-                self._analyse_memory('Final')
 
             self.context.summary_service.add({})
             self.context.summary_service.dump(summary_path)
@@ -223,24 +202,6 @@ class Experiment(BaseObject):
 
         # close all sessions finally and open handlers
         self.agent.close()
-
-    def _analyse_memory(self, name):
-        """
-        Shows the number of newly created elements in memory using objgraph and
-        prints additionally the current memory usage
-
-        Parameters
-        ----------
-        name : string
-            Name of the to be analysed section. Name will be printed in the first row.
-        """
-        import resource
-        import objgraph
-        if self._has_memory_analysis and not self.run_on_gluster:
-            memory = resource.getrusage(resource.RUSAGE_SELF).ru_maxrss
-            self.log(name)
-            self.log(objgraph.show_growth())
-            self.log('Memory consumption is: %s KB' % (memory))
 
     def store_model(self, cycle, episode, update_count, update_with_episode=True):
         if not self.params['training']:

@@ -122,8 +122,6 @@ class Agent(BaseObject):
 
     @abstractmethod
     def observe(self, observation, action, reward, next_observation, done, info={}, guided=False):
-        import objgraph
-
         self.episode_buffer.append(
             [observation, action, reward, next_observation, done, guided])
 
