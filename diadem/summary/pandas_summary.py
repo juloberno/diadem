@@ -8,6 +8,7 @@
 import pandas as pd
 import os
 from diadem.summary.base_summary import BaseSummary
+import logging
 
 class PandasSummary(BaseSummary):
     df = pd.DataFrame()
@@ -33,8 +34,10 @@ class PandasSummary(BaseSummary):
             is_first_dump = not os.path.exists(path)
             self.df.to_csv(path, mode='a',
                            index=False, header=is_first_dump)
+            log_string = self.df.tail(10).mean()
             if reset:
                 self.reset()
+            return log_string
 
     def load(self, path):
         if os.path.exists(path):

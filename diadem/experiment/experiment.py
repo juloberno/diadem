@@ -157,7 +157,9 @@ class Experiment(BaseObject):
                     if self.freeze_every_num_environment_steps > 0 and update_count % self.freeze_every_num_environment_steps == 0:
                         self.store_model(i_cycle, i_episode,
                                          update_count, update_with_episode=False)
-                        self.context.summary_service.dump(summary_path)
+                        log_string = self.context.summary_service.dump(summary_path)
+                        self.log.info("Dumped summary to {}".format(os.path.abspath(summary_path)))
+                        self.log.info("----------------- Summary --------------------- \n {}".format(log_string))
 
                     if done:
                         break
@@ -173,7 +175,9 @@ class Experiment(BaseObject):
                 # Save model and information when new checkpoint is reached
                 if self.freeze_every_num_episodes > 0 and i_episode % self.freeze_every_num_episodes == 0:
                     self.store_model(i_cycle, i_episode, update_count)
-                    self.context.summary_service.dump(summary_path)
+                    log_string = self.context.summary_service.dump(summary_path)
+                    self.log.info("Dumped summary to {}".format(os.path.abspath(summary_path)))
+                    self.log.info("----------------- Summary --------------------- \n {}".format(log_string))
 
                 # Print information about episode and progress if not on gluster
                 self.log.debug("-----------")
