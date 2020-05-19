@@ -13,6 +13,6 @@ class ConsoleSummary(PandasSummary):
 
     def dump(self, path, reset=True):
         print(self.df)
-    
+
     def load(self, path):
         pass

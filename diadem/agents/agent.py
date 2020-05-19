@@ -176,7 +176,7 @@ class Agent(BaseObject):
                 os.path.join(checkpoints_directory, 'agent'),
                 global_step=global_step
             )
-        self.log.info("Freeze to " + save_path)
+        self.log.info("Freeze to " + os.path.abspath(save_path))
 
         with open(os.path.join(checkpoints_directory, 'agent_checkpoint.json'), "w+") as json_file:
             json_file.write(json.dumps({
@@ -193,8 +193,7 @@ class Agent(BaseObject):
     def restore(self):
         file_path = os.path.join(
             self.checkpoints_directory, 'agent_checkpoint.json')
-        # self.log.info("try to store from path: " + file_path)
-        self.log.info("try to store from path: " + file_path)
+        self.log.info("try to store from path: " + os.path.abspath(file_path))
 
         tf.reset_default_graph()
         with self.context.graph.as_default():

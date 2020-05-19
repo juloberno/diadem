@@ -37,6 +37,7 @@ class Experiment(BaseObject):
         self.num_cycles = self.params["num_cycles"]
         self.freeze_every_num_environment_steps = self.params["freeze_every_num_environment_steps"]
         self.freeze_every_num_episodes = self.params["freeze_every_num_episodes"]
+        self.restore_on_start = self.params["restore_on_start"]
         
         self.update_model_every_num_episodes = self.params["update_model_every_num_episodes"]
         self.update_model_every_num_steps = self.params[
@@ -87,7 +88,10 @@ class Experiment(BaseObject):
             self.log.info("Starting with training cycle {}".format(i_cycle))
 
             # saver is created after td-variable creation
-            self.restore(i_cycle)
+            if self.restore_on_start:
+                self.restore(i_cycle)
+            else:
+                self.start_episode = 0
 
             summary_filename = self.params['summary_file'] or 'train.csv'
             summary_path = os.path.join(
@@ -292,8 +296,84 @@ class Experiment(BaseObject):
         return observation, init_error
 
     def evaluation(self, i_cycle, i_episode, i_step, is_final=False):
+        df_folder = self._get_evaluations_file_folder(i_cycle)
+        if not os.path.exists(df_folder):
+            os.makedirs(df_folder, exist_ok=True)
+        df_path = os.path.join(df_folder, "evaluation.csv")
+        if self.context.datamanager is None and self.context.environment.contains_training_data():
+            self.environment_data_evaluation(i_episode, i_step, is_final)
+        elif self.context.datamanager:
+            self.train_test_evaluation(i_episode, i_step, is_final)
+        summary = self.context.summary_service
+        summary.dump(df_path)
+
+    def environment_data_evaluation(self, i_episode, i_step, is_final=False):
+        batch_size = self.final_evaluation_batch_size if is_final else self.tmp_evaluation_batch_size
+        success_rate_buffer = []
+        collision_rate_buffer = []
+        max_steps_rate_buffer = []
+        average_return_buffer = []
+        average_steps_buffer = []
+
+        for i in range(0, batch_size):
+            if not self.run_on_gluster:
+                i += 1
+                msg = 'Train: ' + str(i) + ' / ' + \
+                    str(batch_size) + ' evaluated!'
+                print(msg, end='\r')
+            observation, _ = self.context.environment.reset()
+            total_rewards = 0.0
+
+            # Perform one episode
+            for t in range(self.max_agent_steps):
+                action, _ = self.agent.get_next_best_action(
+                    observation, False, i_episode)
+                next_observation, reward, done, info = self.context.environment.step(
+                    action)
+                goal_reached = info['goal_reached']
+                total_rewards += reward
+                observation = next_observation
+
+                if done:
+                    break
+
+            if not done:
+                max_steps_rate_buffer.append(1)
+            else:
+                max_steps_rate_buffer.append(0)
+
+            average_steps_buffer.append(t)
+            success_rate_buffer.append(int(goal_reached))
+            collision_rate_buffer.append(int(done and not goal_reached))
+            average_return_buffer.append(total_rewards)
+
+        success_rate = np.mean(success_rate_buffer)
+        collision_rate = np.mean(collision_rate_buffer)
+        max_steps_rate = np.mean(max_steps_rate_buffer)
+        average_return = np.mean(average_return_buffer)
+        average_steps = np.mean(average_steps_buffer)
+        exploration_rate = self.agent.explorer.epsilon.val if self.agent.explorer else 0
+        priorisation_beta = self.agent.per_beta.val if self.agent.per_beta else 0
+
+        summary = self.context.summary_service
+        summary.add({
+            "success_rate": success_rate,
+            "collision_rate": collision_rate,
+            "max_steps_rate": max_steps_rate,
+            "average_return": average_return,
+            "average_steps": average_steps,
+            "episode": i_episode,
+            "step": i_step,
+            "sample_idx": "resets",
+            "exploration_rate": exploration_rate,
+            "priorisation_beta": priorisation_beta,
+            **self._sysinfo
+        })
+
+
+    def train_test_evaluation(self, i_episode, i_step, is_final=False):
         if self.context.datamanager is None:
-            self.log.error("Could not find datamanager")
+            self.log.error("Could not find datamanager for train/test evaluation")
             return
 
         if is_final:
@@ -320,20 +400,12 @@ class Experiment(BaseObject):
                 batch_size)
             batches_idx["test"] = self.context.datamanager.current_test_batch_idx
 
-        summary = self.context.summary_service
-
         for batch_name, batch in batches.items():
             success_rate_buffer = []
             collision_rate_buffer = []
             max_steps_rate_buffer = []
             average_return_buffer = []
             average_steps_buffer = []
-
-            df_folder = self._get_evaluations_file_folder(i_cycle)
-            if not os.path.exists(df_folder):
-                os.makedirs(df_folder, exist_ok=True)
-
-            df_path = os.path.join(df_folder, batch_name + '.csv')
 
             i = 0
             for s in batch:
@@ -376,7 +448,9 @@ class Experiment(BaseObject):
             exploration_rate = self.agent.explorer.epsilon.val if self.agent.explorer else 0
             priorisation_beta = self.agent.per_beta.val if self.agent.per_beta else 0
 
+            summary = self.context.summary_service
             summary.add({
+                "batch_name" : batch_name,
                 "success_rate": success_rate,
                 "collision_rate": collision_rate,
                 "max_steps_rate": max_steps_rate,
@@ -389,7 +463,6 @@ class Experiment(BaseObject):
                 "priorisation_beta": priorisation_beta,
                 **self._sysinfo
             })
-            summary.dump(df_path)
 
     @property
     def _sysinfo(self):
