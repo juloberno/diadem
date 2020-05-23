@@ -140,12 +140,13 @@ class Experiment(BaseObject):
 
                     if update_count % self.update_model_every_num_steps == 0:
                        self.agent.update_model()
-
-                    self.log.debug('---------------------')
-                    self.log.debug('Action: ' + str(env_action))
-                    self.log.debug('Step count: ' +
-                            str(step_count))
-                    self.log.debug('Step Reward: ' + str(reward))
+                    
+                    if not self.run_on_gluster:
+                        self.log.debug('---------------------')
+                        self.log.debug('Action: ' + str(env_action))
+                        self.log.debug('Step count: ' +
+                                str(step_count))
+                        self.log.debug('Step Reward: ' + str(reward))
 
                     if self.visualizer is not None:
                         self.visualizer.visualize(episode=i_episode, step=step_count, last_step=(done or step_count == self.max_agent_steps))
