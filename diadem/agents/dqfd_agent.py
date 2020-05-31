@@ -89,10 +89,10 @@ class DQfDAgent(ExperienceReplayAgent):
             )
 
     def target_network(self, states, *args, **kwargs):
-        return self._q_network('target_network', states, *args, **kwargs)
+        return self._q_network('target_network', states, *args, **kwargs)+self.prior_network
 
     def prediction_network(self, states, *args, **kwargs):
-        return self._q_network('prediction_network', states, *args, **kwargs)
+        return self._q_network('prediction_network', states, *args, **kwargs)+self.prior_network
 
     @namescope('input')
     def input(self):
