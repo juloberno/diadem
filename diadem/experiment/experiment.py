@@ -300,6 +300,20 @@ class Experiment(BaseObject):
             observation, init_error = self.context.environment.reset()
         return observation, init_error
 
+    def evaluation_from_stored(self, cycle, render=True):
+        self.agent.initialize(
+                evaluations_directory=self._get_evaluations_file_folder(
+                    cycle),
+                log_directory=self._get_log_file_folder(cycle),
+                checkpoints_directory=self._get_checkpoint_folder(cycle),
+                **self.additional_agent_kwargs
+            )
+        self.restore(cycle)
+        episode = self.start_episode
+        step = 0
+        return self.evaluation(cycle, episode, step, is_final=True)
+
+
     def evaluation(self, i_cycle, i_episode, i_step, is_final=False):
         df_folder = self._get_evaluations_file_folder(i_cycle)
         if not os.path.exists(df_folder):
@@ -312,7 +326,7 @@ class Experiment(BaseObject):
         summary = self.context.summary_service
         summary.dump(df_path)
 
-    def environment_data_evaluation(self, i_episode, i_step, is_final=False):
+    def environment_data_evaluation(self, i_episode, i_step, is_final=False, render=False):
         batch_size = self.final_evaluation_batch_size if is_final else self.tmp_evaluation_batch_size
         success_rate_buffer = []
         collision_rate_buffer = []
@@ -335,6 +349,8 @@ class Experiment(BaseObject):
                     observation, False, i_episode)
                 next_observation, reward, done, info = self.context.environment.step(
                     action)
+                if render:
+                    self.context.environment.render()
                 goal_reached = info['goal_reached']
                 total_rewards += reward
                 observation = next_observation
